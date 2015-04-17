@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Keyboard</title>
+	<style>
+		#instructions {
+			width: 347px;
+		    padding: 25px;
+		    border: 2px solid grey;
+		    margin: 0px;
+		    font-family: Arial;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="400" height="400"></canvas>
+	<p id="instructions"> Use the arrow keys to control the direction of the ball.  Use the space bar to stop the ball. </p>
+	<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+	
+	<script>
+
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	var width = canvas.width;
+	var height = canvas.height;
+
+	// ABOVE:  Document.getElementById selects the canvas element, and width and height parameters are set. 
+
+	var circle = function (x, y, radius, fillCircle) {
+		ctx.beginPath();
+		ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+		if (fillCircle) {
+			ctx.fill();
+		}  else {
+			ctx.stroke();
+		}
+	};  // ABOVE: The circle function takes 4 arguments: x, y, radius, and fillCircle.  The arc method creates the circle at the position of x, y.
+
+	// THE BALL CONSTRUCTOR
+	var Ball = function () {
+		this.x = width / 2;
+		this.y = height / 2;
+		this.xSpeed = 5;
+		this.ySpeed = 0;
+	};  
+		// ABOVE:  The ball constructor creates the moving ball object, and it's speed is controlled by x/ySpeed
+
+	// UPDATE THE BALL'S POSITION BASED UPON ITS SPEED
+	Ball.prototype.move = function () {
+		this.x += this.xSpeed;
+		this.y += this.ySpeed;
+
+		if (this.x < 0) {
+			this.x = width;
+		} else if (this.x > width) {
+			this.x = 0;
+		} else if (this.y < 0) {
+			this.y = height;
+		} else if (this.y > height) {
+			this.y = 0
+		}
+	};
+
+	//  DRAW THE BALL AT ITS CURRENT POSITION
+	Ball.prototype.draw = function () {
+		circle(this.x, this.y, 10, true);
+	};
+
+	//  SET THE BALL'S DIRECTION BASED UPON A STRING 
+	Ball.prototype.setDirection = function (direction) {
+		if (direction === "up") {
+			this.xSpeed = 0;
+			this.ySpeed = -5;
+		} else if (direction === "down") {
+			this.xSpeed = 0;
+			this.ySpeed = 5;
+		} else if (direction === "left") {
+			this.xSpeed = -5;
+			this.ySpeed = 0;
+		} else if (direction === "right") {
+			this.xSpeed = 5;
+			this.ySpeed = 0;	
+		} else if (direction === "stop") {
+			this.xSpeed = 0;
+			this.ySpeed = 0;
+			}
+		};
+		
+	//  CREATE THE BALL OBJECT
+	var ball = new Ball();
+
+	//  AN OBJECT TO CONVERT KEYCODES INTO ACTION NAMES
+	var keyActions = {
+		32: "stop",
+		37: "left", 
+		38: "up",
+		39: "right",
+		40: "down"
+	};
+
+
+	// THE KEYDOWN HANDLER THAT WILL BE CALLED FOR EVERY KEYPRESS
+	$("body").keydown(function (event) {
+		var direction = keyActions[event.keyCode];
+		ball.setDirection(direction);
+	});  
+
+
+		// ABOVE:  The jQuery $function selects the 'body' element and then uses the keydown method to act upon any keydown events.  Whenever a key is pressed, the fuction changes the direction of the ball to match the keyActions variable defined above. 
+
+	//  THE ANIMATION FUNCTION, CALLED EVERY 30 MS
+	setInterval(function () {
+		ctx.clearRect(0, 0, width, height);
+
+		ball.draw();
+		ball.move();
+
+		ctx.strokeRect(0, 0, width, height);
+	}, 30);		
+
+
+
+
+	</script>
+</body>
+</html>
+
